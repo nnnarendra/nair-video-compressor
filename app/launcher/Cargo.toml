@@ -1,0 +1,11 @@
+[package]
+name = "nair-video-compressor-launcher"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

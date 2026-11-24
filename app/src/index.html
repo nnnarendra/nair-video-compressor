@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NAIR / VIDEO COMPRESSOR</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- HEADER BAR -->
+    <header class="header-bar">
+      <div class="header-brand">
+        <p class="eyebrow">01 / MEDIA COMPRESSION ENGINE</p>
+        <div class="title-row">
+          <h1>NAIR VIDEO COMPRESSOR</h1>
+          <span id="app-version" class="version-tag">v0.1.0</span>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <div class="status-cell">
+          <span class="meta-label">FFMPEG</span>
+          <span id="ffmpeg-status-text" class="meta-value is-muted">CHECKING...</span>
+        </div>
+        <div class="status-cell">
+          <span class="meta-label">HARDWARE</span>
+          <span id="hardware-status-text" class="meta-value is-muted">—</span>
+        </div>
+        <button id="btn-recheck" class="btn btn-outline btn-sm" type="button" title="Re-check FFmpeg and GPU NVENC">
+          RECHECK
+        </button>
+      </div>
+    </header>
+
+    <!-- FFMPEG MISSING / DOWNLOAD BANNER -->
+    <section id="ffmpeg-banner" class="ffmpeg-banner is-hidden" aria-live="polite">
+      <div class="banner-main">
+        <div class="banner-copy">
+          <p class="eyebrow">SYSTEM WARNING / FFMPEG NOT FOUND</p>
+          <p id="ffmpeg-banner-desc" class="banner-desc">
+            <code>ffmpeg.exe</code> was not found next to the app or in system PATH. Download the official Essentials build (~80 MB) directly to the portable folder.
+          </p>
+        </div>
+        <div class="banner-actions">
+          <button id="btn-download-ffmpeg" class="btn btn-red" type="button">
+            DOWNLOAD FFMPEG (~80 MB)
+          </button>
+        </div>
+      </div>
+      <div id="download-progress-wrap" class="download-progress-wrap is-hidden">
+        <div class="progress-track">
+          <div id="download-progress-fill" class="progress-fill is-red" style="width: 0%"></div>
+        </div>
+        <div class="download-meta">
+          <span id="download-stage-text">Preparing download...</span>
+          <span id="download-pct-text" class="tabular">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISMISSIBLE NOTICE STRIP -->
+    <section id="notice-bar" class="notice-bar is-hidden" role="status" aria-live="polite">
+      <span id="notice-text" class="notice-text"></span>
+      <button id="btn-dismiss-notice" class="btn-icon" type="button" aria-label="Dismiss notification">×</button>
+    </section>
+
+    <!-- DROP ZONE -->
+    <section id="drop-zone" class="drop-zone" tabindex="0" aria-label="Video or folder drag and drop zone">
+      <div class="drop-copy">
+        <p class="drop-title">DRAG &amp; DROP VIDEOS OR FOLDERS</p>
+        <p class="drop-sub">MP4 · MOV · MKV · AVI · WEBM — SUPPORTS MULTI-FILE &amp; BATCH FOLDERS</p>
+      </div>
+      <div class="drop-actions">
+        <button id="btn-pick-files" class="btn btn-outline" type="button">+ ADD FILES</button>
+        <button id="btn-pick-folder" class="btn btn-outline" type="button">+ ADD FOLDER</button>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION PANEL (4-COLUMN SWISS GRID) -->
+    <section class="config-grid" aria-label="Compression settings">
+      <!-- 1. PRESET -->
+      <div class="config-cell">
+        <label class="field-label" for="preset-select">01 / PRESET</label>
+        <select id="preset-select" class="swiss-select">
+          <option value="ringan">Light — High Quality</option>
+          <option value="seimbang">Balanced — Recommended</option>
+          <option value="youtube">YouTube — Upload Quality</option>
+          <option value="kecil">Compact — Smallest Size</option>
+          <option value="265">H.265 — Maximum Compression</option>
+        </select>
+        <p id="preset-meta" class="field-note tabular">libx264 · CRF 23 · medium · AAC 128k</p>
+      </div>
+
+      <!-- 2. RESOLUTION -->
+      <div class="config-cell">
+        <span class="field-label">02 / RESOLUTION</span>
+        <div id="resolusi-group" class="segmented-group" role="group" aria-label="Output resolution">
+          <button type="button" class="seg-btn is-active" data-res="">Original</button>
+          <button type="button" class="seg-btn" data-res="1080">1080p</button>
+          <button type="button" class="seg-btn" data-res="720">720p</button>
+          <button type="button" class="seg-btn" data-res="480">480p</button>
+        </div>
+        <p id="resolusi-note" class="field-note">Original resolution preserved</p>
+      </div>
+
+      <!-- 3. ACCELERATION -->
+      <div class="config-cell">
+        <span class="field-label">03 / ACCELERATION</span>
+        <div id="gpu-group" class="segmented-group segmented-2" role="group" aria-label="Hardware mode">
+          <button type="button" class="seg-btn" data-gpu="true">GPU (NVENC)</button>
+          <button type="button" class="seg-btn is-active" data-gpu="false">CPU</button>
+        </div>
+        <p id="gpu-note" class="field-note">CPU stable (libx264)</p>
+      </div>
+
+      <!-- 4. OUTPUT -->
+      <div class="config-cell">
+        <span class="field-label">04 / OUTPUT FOLDER</span>
+        <div class="output-box">
+          <span id="output-path-display" class="output-path" title="compressed/ next to source files">
+            compressed/ (next to source)
+          </span>
+        </div>
+        <div class="output-actions">
+          <button id="btn-pick-output" class="btn btn-outline btn-xs" type="button">BROWSE</button>
+          <button id="btn-reset-output" class="btn btn-outline btn-xs" type="button">RESET</button>
+          <button id="btn-open-output" class="btn btn-outline btn-xs" type="button">OPEN</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUEUE SECTION -->
+    <section class="queue-section" aria-label="Video queue">
+      <div class="queue-header">
+        <span class="col-num">#</span>
+        <span class="col-file">FILE</span>
+        <span class="col-size">SIZE</span>
+        <span class="col-progress">PROGRESS &amp; METRICS</span>
+        <span class="col-result">RESULT</span>
+        <span class="col-action">ACTION</span>
+      </div>
+      <div id="queue-list" class="queue-list">
+        <div class="queue-empty">
+          <p class="empty-title">QUEUE EMPTY</p>
+          <p class="empty-sub">Drag and drop video files or folders above to get started.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER ACTION BAR -->
+    <footer class="footer-bar">
+      <div id="footer-summary" class="footer-summary tabular">
+        0 FILES · 0.0 MB
+      </div>
+      <div class="footer-actions">
+        <button id="btn-clear" class="btn btn-outline" type="button" disabled>CLEAR QUEUE</button>
+        <button id="btn-cancel" class="btn btn-red is-hidden" type="button">CANCEL</button>
+        <button id="btn-start" class="btn btn-primary" type="button" disabled>START COMPRESSION</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

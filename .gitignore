@@ -1,0 +1,4 @@
+app/src-tauri/target/
+app/launcher/target/
+dist/
+*.log
