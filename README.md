@@ -1,6 +1,6 @@
 # Nair Video Compressor
 
-A lightweight, portable Windows video compressor powered by **FFmpeg**, featuring a **Minimalism & Swiss Style** desktop UI built with **Tauri v2** alongside the original interactive PowerShell/Batch CLI scripts.
+A lightweight, portable Windows video compressor powered by **FFmpeg**, built with **Tauri v2** alongside the original interactive PowerShell/Batch CLI scripts.
 
 ---
 
