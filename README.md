@@ -2,6 +2,8 @@
 
 A lightweight, portable Windows video compressor powered by **FFmpeg**, built with **Tauri v2** alongside the original interactive PowerShell/Batch CLI scripts.
 
+![Nair Video Compressor](Screenshot.png)
+
 ---
 
 ## Features
@@ -83,7 +85,7 @@ nair-video-compressor/
 ├── kompres-video-settings.json    # Persisted settings shared by GUI & CLI
 └── app/
     ├── build-portable.ps1         # Release & single-file portable build script
-    ├── src/                       # Minimalism & Swiss Style frontend (HTML/CSS/JS)
+    ├── src/                       # Desktop frontend (HTML/CSS/JS)
     ├── src-tauri/                 # Tauri v2 Rust backend (FFmpeg, settings, IPC)
     └── launcher/                  # Single-file portable wrapper crate
 ```
